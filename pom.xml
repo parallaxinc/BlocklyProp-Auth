@@ -73,7 +73,7 @@
                 <version>2.2</version>
                 <configuration>
                     <url>${tomcat.url}</url>
-                    <path>/blockly</path>
+                    <path>/blocklyauth</path>
                     <username>${tomcat.username}</username>
                     <password>${tomcat.password}</password>
                     <update>true</update>

@@ -40,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Inject
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
-        authenticateService = new CloudSessionAuthenticateService(configuration.getString("cloudsession.baseurl"));
+        authenticateService = new CloudSessionAuthenticateService(configuration.getString("cloudsession.server"), configuration.getString("cloudsession.baseurl"));
         authenticationTokenService = new CloudSessionAuthenticationTokenService(configuration.getString("cloudsession.server"), configuration.getString("cloudsession.baseurl"));
     }
 

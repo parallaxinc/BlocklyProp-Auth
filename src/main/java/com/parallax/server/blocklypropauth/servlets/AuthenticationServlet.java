@@ -33,8 +33,8 @@ public class AuthenticationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
         resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setContentType("application/json");
 
         String username = req.getParameter("username");
         String password = req.getParameter("password");
@@ -57,6 +57,12 @@ public class AuthenticationServlet extends HttpServlet {
             resp.getWriter().write(JsonUtils.createJsonSuccess(result).toString());
         }
 
+    }
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setContentType("application/json");
     }
 
 }

@@ -17,8 +17,11 @@ import com.parallax.client.cloudsession.exceptions.UnknownUserIdException;
 import com.parallax.client.cloudsession.exceptions.UserBlockedException;
 import com.parallax.client.cloudsession.objects.User;
 import com.parallax.server.blocklypropauth.AuthenticationResult;
+import com.parallax.server.blocklypropauth.security.IdAuthenticationToken;
 import com.parallax.server.blocklypropauth.services.AuthenticationService;
 import org.apache.commons.configuration.Configuration;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             User user = authenticateService.authenticateLocalUser(username, password);
             String token = authenticationTokenService.request(user.getId(), browser, ipAddress);
 
+            doAuthentication(user);
+
             return new AuthenticationResult(user, token);
         } catch (UnknownUserException ex) {
             log.info("Unkown user: {}", username);
@@ -63,6 +68,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.error("Server error: {}", username);
         }
         return null;
+    }
+
+    private void doAuthentication(User user) {
+        Subject currentUser = SecurityUtils.getSubject();
+        IdAuthenticationToken idAuthenticationToken = new IdAuthenticationToken(user.getId());
+
+        try {
+            currentUser.login(idAuthenticationToken);
+        } catch (Throwable t) {
+            log.error("Error while authenticating", t);
+        }
     }
 
 }

@@ -34,6 +34,9 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
+            <resource>
+                <directory>src/main/config/${environment}</directory>
+            </resource>
         </resources>
         <plugins>
             <plugin>
@@ -171,26 +174,23 @@
         </plugins>
     </build>
 
-
-    <!--
-        <profiles>
-            <profile>
-                <id>default</id>
-                <activation>
-                    <activeByDefault>true</activeByDefault>
-                </activation>
-                <properties>
-                    <environment>default</environment>
-                </properties>
-            </profile>
-            <profile>
-                <id>production</id>
-                <properties>
-                    <environment>production</environment>
-                </properties>
-            </profile>
-        </profiles>
-    -->
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <environment>default</environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>production</id>
+            <properties>
+                <environment>production</environment>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
         <!-- Servlet and jsp libs provided by tomcat -->

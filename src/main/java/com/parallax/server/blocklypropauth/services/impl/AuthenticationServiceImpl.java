@@ -6,6 +6,7 @@
 package com.parallax.server.blocklypropauth.services.impl;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.persist.Transactional;
 import com.parallax.client.cloudsession.CloudSessionAuthenticateService;
@@ -19,6 +20,7 @@ import com.parallax.client.cloudsession.objects.User;
 import com.parallax.server.blocklypropauth.AuthenticationResult;
 import com.parallax.server.blocklypropauth.security.IdAuthenticationToken;
 import com.parallax.server.blocklypropauth.services.AuthenticationService;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -37,6 +39,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private Configuration configuration;
 
+    private Provider<HttpSession> sessionProvider;
+
     private CloudSessionAuthenticateService authenticateService;
     private CloudSessionAuthenticationTokenService authenticationTokenService;
 
@@ -45,6 +49,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.configuration = configuration;
         authenticateService = new CloudSessionAuthenticateService(configuration.getString("cloudsession.server"), configuration.getString("cloudsession.baseurl"));
         authenticationTokenService = new CloudSessionAuthenticationTokenService(configuration.getString("cloudsession.server"), configuration.getString("cloudsession.baseurl"));
+    }
+
+    @Inject
+    public void setSessionProvider(Provider<HttpSession> sessionProvider) {
+        this.sessionProvider = sessionProvider;
     }
 
     @Override
@@ -76,6 +85,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         try {
             currentUser.login(idAuthenticationToken);
+
+            sessionProvider.get().setAttribute("idUser", user.getId());
+
+            log.info("User logged in: {}", user.getId());
         } catch (Throwable t) {
             log.error("Error while authenticating", t);
         }

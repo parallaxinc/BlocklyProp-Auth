@@ -18,13 +18,14 @@ import com.parallax.client.cloudsession.exceptions.PasswordVerifyException;
 import com.parallax.client.cloudsession.exceptions.ServerException;
 import com.parallax.client.cloudsession.exceptions.UnknownUserIdException;
 import com.parallax.client.cloudsession.objects.User;
-import com.parallax.server.blocklypropauth.security.AuthenticationInfo;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,6 +35,8 @@ import org.apache.commons.configuration.Configuration;
 @Group(name = "/profile", title = "Change profile info")
 @HttpCode("500>Internal Server Error,200>Success Response")
 public class RestProfile {
+
+    private static final Logger log = LoggerFactory.getLogger(RestProfile.class);
 
     private CloudSessionLocalUserService cloudSessionLocalUserService;
     private CloudSessionUserService cloudSessionUserService;
@@ -51,7 +54,7 @@ public class RestProfile {
     @Detail("Save base profile data")
     @Name("Save base profile data")
     @Produces("application/json")
-    public Response saveBase(@FormParam("screenname") String screenname) {
+    public Response saveBase(@FormParam("id") Long id, @FormParam("username") String username, @FormParam("password") String password, @FormParam("screenname") String screenname) {
         JsonObject result = new JsonObject();
         if (Strings.isNullOrEmpty(screenname)) {
             result.addProperty("success", false);
@@ -59,7 +62,7 @@ public class RestProfile {
             return Response.ok(result.toString()).build();
         } else {
             try {
-                User user = cloudSessionUserService.changeUserInfo(AuthenticationInfo.getUserId(), screenname);
+                User user = cloudSessionUserService.changeUserInfo(id, screenname);
                 if (user != null) {
                     result.addProperty("success", true);
                     result.addProperty("screenname", user.getScreenname());
@@ -86,7 +89,7 @@ public class RestProfile {
     @Detail("Save password data")
     @Name("Save password data")
     @Produces("application/json")
-    public Response savePassword(@FormParam("oldpassword") String oldPassword, @FormParam("password") String password, @FormParam("confirmpassword") String confirmPassword) {
+    public Response savePassword(@FormParam("id") Long id, @FormParam("username") String username, @FormParam("oldpassword") String oldPassword, @FormParam("password") String password, @FormParam("confirmpassword") String confirmPassword) {
         JsonObject result = new JsonObject();
 
         if (Strings.isNullOrEmpty(oldPassword) || Strings.isNullOrEmpty(password) || Strings.isNullOrEmpty(confirmPassword)) {
@@ -99,7 +102,7 @@ public class RestProfile {
             return Response.ok(result.toString()).build();
         } else {
             try {
-                if (cloudSessionLocalUserService.changePassword(AuthenticationInfo.getUserId(), oldPassword, password, confirmPassword)) {
+                if (cloudSessionLocalUserService.changePassword(id, oldPassword, password, confirmPassword)) {
                     result.addProperty("success", true);
                     return Response.ok(result.toString()).build();
                 } else {

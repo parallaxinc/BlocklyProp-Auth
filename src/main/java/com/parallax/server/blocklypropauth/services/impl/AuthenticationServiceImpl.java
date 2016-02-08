@@ -60,11 +60,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthenticationResult authenticate(String username, String password, String browser, String ipAddress) {
         try {
             User user = authenticateService.authenticateLocalUser(username, password);
-            String token = authenticationTokenService.request(user.getId(), browser, ipAddress);
+            if (user != null) {
+                String token = authenticationTokenService.request(user.getId(), browser, ipAddress);
+                doAuthentication(user);
 
-            doAuthentication(user);
-
-            return new AuthenticationResult(user, token);
+                return new AuthenticationResult(user, token);
+            } else {
+                return null;
+            }
         } catch (UnknownUserException ex) {
             log.info("Unkown user: {}", username);
         } catch (UserBlockedException ex) {

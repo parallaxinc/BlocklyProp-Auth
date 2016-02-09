@@ -37,8 +37,6 @@ public class SetupConfig extends GuiceServletContextListener {
                 bind(Configuration.class).toInstance(configuration);
 
 //                bind(SessionData.class);
-                install(new PersistenceModule(configuration));
-                install(new DaoModule());
                 install(new ServiceModule());
                 install(new ServletsModule());
                 install(new RestModule());

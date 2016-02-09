@@ -8,7 +8,6 @@ package com.parallax.server.blocklypropauth.services.impl;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.persist.Transactional;
 import com.parallax.client.cloudsession.CloudSessionAuthenticateService;
 import com.parallax.client.cloudsession.CloudSessionAuthenticationTokenService;
 import com.parallax.client.cloudsession.exceptions.EmailNotConfirmedException;
@@ -18,12 +17,9 @@ import com.parallax.client.cloudsession.exceptions.UnknownUserIdException;
 import com.parallax.client.cloudsession.exceptions.UserBlockedException;
 import com.parallax.client.cloudsession.objects.User;
 import com.parallax.server.blocklypropauth.AuthenticationResult;
-import com.parallax.server.blocklypropauth.security.IdAuthenticationToken;
 import com.parallax.server.blocklypropauth.services.AuthenticationService;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.Configuration;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +28,6 @@ import org.slf4j.LoggerFactory;
  * @author Michel
  */
 @Singleton
-@Transactional
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private static Logger log = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
@@ -62,7 +57,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             User user = authenticateService.authenticateLocalUser(username, password);
             if (user != null) {
                 String token = authenticationTokenService.request(user.getId(), browser, ipAddress);
-                doAuthentication(user);
 
                 return new AuthenticationResult(user, token);
             } else {
@@ -80,21 +74,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.error("Server error: {}", username);
         }
         return null;
-    }
-
-    private void doAuthentication(User user) {
-        Subject currentUser = SecurityUtils.getSubject();
-        IdAuthenticationToken idAuthenticationToken = new IdAuthenticationToken(user.getId());
-
-        try {
-            currentUser.login(idAuthenticationToken);
-
-            sessionProvider.get().setAttribute("idUser", user.getId());
-
-            log.info("User logged in: {}", user.getId());
-        } catch (Throwable t) {
-            log.error("Error while authenticating", t);
-        }
     }
 
 }

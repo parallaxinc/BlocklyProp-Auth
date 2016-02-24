@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.parallax.client.cloudsession.CloudSessionLocalUserService;
 import com.parallax.client.cloudsession.CloudSessionUserService;
+import com.parallax.client.cloudsession.exceptions.PasswordComplexityException;
 import com.parallax.client.cloudsession.exceptions.PasswordVerifyException;
 import com.parallax.client.cloudsession.exceptions.ServerException;
 import com.parallax.client.cloudsession.exceptions.UnknownUserIdException;
@@ -121,6 +122,10 @@ public class RestProfile {
             } catch (ServerException se) {
                 result.addProperty("success", false);
                 result.addProperty("message", "server-error");
+                return Response.ok(result.toString()).build();
+            } catch (PasswordComplexityException pce) {
+                result.addProperty("success", false);
+                result.addProperty("message", "password-complexity");
                 return Response.ok(result.toString()).build();
             }
         }

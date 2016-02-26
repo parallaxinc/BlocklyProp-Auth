@@ -16,6 +16,7 @@ import com.parallax.client.cloudsession.CloudSessionLocalUserService;
 import com.parallax.client.cloudsession.CloudSessionUserService;
 import com.parallax.client.cloudsession.exceptions.PasswordComplexityException;
 import com.parallax.client.cloudsession.exceptions.PasswordVerifyException;
+import com.parallax.client.cloudsession.exceptions.ScreennameUsedException;
 import com.parallax.client.cloudsession.exceptions.ServerException;
 import com.parallax.client.cloudsession.exceptions.UnknownUserIdException;
 import com.parallax.client.cloudsession.objects.User;
@@ -76,6 +77,10 @@ public class RestProfile {
             } catch (UnknownUserIdException uuie) {
                 result.addProperty("success", false);
                 result.addProperty("message", "unknown-user");
+                return Response.ok(result.toString()).build();
+            } catch (ScreennameUsedException sue) {
+                result.addProperty("success", false);
+                result.addProperty("message", "screenname-used");
                 return Response.ok(result.toString()).build();
             } catch (ServerException se) {
                 result.addProperty("success", false);
